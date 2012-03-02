@@ -123,7 +123,11 @@ function SlashCmdList.SPEW(text)
 	elseif input == "mouse" then
 		local t, f = {}, EnumerateFrames()
 		while f do
-			if f:IsVisible() and MouseIsOver(f) then table.insert(t, f:GetName() or "<Anon>") end
+			if f:IsVisible() and MouseIsOver(f) then 
+				local level, strata, type = f:GetFrameLevel() or '<nil>', f:GetFrameStrata() or '<nil>', f.GetObjectType and f:GetObjectType() or '<unknown>'
+				local name = f:GetName() or "<Anon>"
+				table.insert(t, format("%s - Type=%s, Strata=%s, Level=%s",name,tostring(type),tostring(strata),tostring(level))) 
+			end
 			f = EnumerateFrames(f)
 		end
 		Spew("Visible frames under mouse", t)
