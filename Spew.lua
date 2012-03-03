@@ -1,4 +1,6 @@
 
+local function err(msg,...) msg:format(tostringall(...)) end
+
 local TABLEITEMS, TABLEDEPTH = 5, 1
 local tostring, TableToString = tostring
 
@@ -78,7 +80,13 @@ local function downcasesort(a,b)
 	if ta == "number" and tb == "number" then return a < b end
 	return a and b and tostring(a):lower() < tostring(b):lower()
 end
-local function pcallhelper(success, ...) if success then return string.join(", ", ArgsToString(...)) end end
+local function pcallhelper(success, ...)
+	if success then
+		return string.join(", ", ArgsToString(...))
+	else
+		--return "Error Eric: "..ArgsToString(select(1,...))
+	end
+end
 function Spew(input, a1, ...)
 	if select('#', ...) == 0 then
 		if type(a1) == "table" then
@@ -109,8 +117,12 @@ function Spew(input, a1, ...)
 				Print("|cff9f9f9f}  -- "..input.."|r")
 				ShowUIPanel(panel)
 			end
-		else Print("|cff999999"..input.."|r => "..pretty_tostring(a1), DEFAULT_CHAT_FRAME) end
+		else
+			--err("pretty_tostring: input = %s, a1 = %s",input, a1)
+			Print("|cff999999"..input.."|r => "..pretty_tostring(a1), DEFAULT_CHAT_FRAME)
+		end
 	else
+		--err("ArgsToSring: input = %s, a1 = %s",input, a1)
 		Print("|cff999999"..input.."|r => "..string.join(", ", ArgsToString(a1, ...)), DEFAULT_CHAT_FRAME)
 	end
 end
@@ -123,17 +135,23 @@ function SlashCmdList.SPEW(text)
 	elseif input == "mouse" then
 		local t, f = {}, EnumerateFrames()
 		while f do
-			if f:IsVisible() and MouseIsOver(f) then 
+			if f:IsVisible() and MouseIsOver(f) then
 				local level, strata, type = f:GetFrameLevel() or '<nil>', f:GetFrameStrata() or '<nil>', f.GetObjectType and f:GetObjectType() or '<unknown>'
 				local name = f:GetName() or "<Anon>"
-				table.insert(t, format("%s - Type=%s, Strata=%s, Level=%s",name,tostring(type),tostring(strata),tostring(level))) 
+				table.insert(t, format("%s - Type=%s, Strata=%s, Level=%s",name,tostring(type),tostring(strata),tostring(level)))
 			end
 			f = EnumerateFrames(f)
 		end
 		Spew("Visible frames under mouse", t)
 	else
-		local f, err = loadstring(string.format("Spew(%q, %s)", input, input))
-		if f then f() else Print("|cffff0000Error:|r "..err) end
+		local f, error = loadstring(string.format("Spew(%q, %s)", input, input))
+		--if f then f() else Print("|cffff0000Error:|r "..error) end
+		if error then
+			Print("|cffff0000Error:|r "..error)
+		else
+			local success, error = pcall(f)
+			if not success then Print("|cffff0000Error:|r "..error) end
+		end
 	end
 end
 
