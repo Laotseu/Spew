@@ -25,6 +25,7 @@ cf:SetScript("OnMouseWheel", function(frame, delta)
 end)
 
 
+
 local b = LibStub("tekKonfig-Button").new(cf, "TOPRIGHT", cf, "BOTTOMRIGHT", -155, -3)
 b:SetText("Clear")
 b:SetScript("OnClick", function() cf:Clear() end)
@@ -34,6 +35,10 @@ local function Print(text, frame)
 	(frame or cf):AddMessage(text)
 end
 
+local function PrintError(text)
+	local frame = panel:IsShown() and cf or DEFAULT_CHAT_FRAME
+	Print("|cffff0000Error:|r "..text, frame)
+end
 
 local colors = {boolean = "|cffff9100", number = "|cffff7fff", ["nil"] = "|cffff7f7f"}
 local noescape = {["\a"] = "a", ["\b"] = "b", ["\f"] = "f", ["\n"] = "n", ["\r"] = "r", ["\t"] = "t", ["\v"] = "v"}
@@ -81,11 +86,7 @@ local function downcasesort(a,b)
 	return a and b and tostring(a):lower() < tostring(b):lower()
 end
 local function pcallhelper(success, ...)
-	if success then
-		return string.join(", ", ArgsToString(...))
-	else
-		--return "Error Eric: "..ArgsToString(select(1,...))
-	end
+	if success then return string.join(", ", ArgsToString(...)) end
 end
 function Spew(input, a1, ...)
 	if select('#', ...) == 0 then
@@ -118,11 +119,9 @@ function Spew(input, a1, ...)
 				ShowUIPanel(panel)
 			end
 		else
-			--err("pretty_tostring: input = %s, a1 = %s",input, a1)
 			Print("|cff999999"..input.."|r => "..pretty_tostring(a1), DEFAULT_CHAT_FRAME)
 		end
 	else
-		--err("ArgsToSring: input = %s, a1 = %s",input, a1)
 		Print("|cff999999"..input.."|r => "..string.join(", ", ArgsToString(a1, ...)), DEFAULT_CHAT_FRAME)
 	end
 end
@@ -144,13 +143,12 @@ function SlashCmdList.SPEW(text)
 		end
 		Spew("Visible frames under mouse", t)
 	else
-		local f, error = loadstring(string.format("Spew(%q, %s)", input, input))
-		--if f then f() else Print("|cffff0000Error:|r "..error) end
+		local f, error = loadstring(string.format("Spew(%q, %s)", input, input),input)
 		if error then
-			Print("|cffff0000Error:|r "..error)
+			PrintError(error)
 		else
 			local success, error = pcall(f)
-			if not success then Print("|cffff0000Error:|r "..error) end
+			if not success then PrintError(error) end
 		end
 	end
 end
