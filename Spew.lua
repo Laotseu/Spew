@@ -1,5 +1,5 @@
 
-local function err(msg,...) msg:format(tostringall(...)) end
+local function err(msg,...) _G.geterrorhandler()(msg:format(tostringall(...)) .. " - " .. _G.time()) end
 
 local TABLEITEMS, TABLEDEPTH = 5, 1
 local tostring, TableToString = tostring
