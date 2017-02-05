@@ -30,9 +30,16 @@ local b = LibStub("tekKonfig-Button").new(cf, "TOPRIGHT", cf, "BOTTOMRIGHT", -15
 b:SetText("Clear")
 b:SetScript("OnClick", function() cf:Clear() end)
 
+local lpt = LibStub("LibPrintTo-1.0", true)
+local chat_print = lpt and lpt:CreateChatPrintFunction(nil, "spew, output") or nil
+
 local function Print(text, frame)
 	if not text or text:len() == 0 then text = " " end
-	(frame or cf):AddMessage(text)
+	if frame == DEFAULT_CHAT_FRAME and chat_print then
+		chat_print(text)
+	else
+		(frame or cf):AddMessage(text)
+	end
 end
 
 local function PrintError(text)

@@ -4,6 +4,8 @@
 ## Notes: Spews out lua
 ## Author: Tekkub Stoutwrithe
 ## Version: Alpha
+## OptionalDeps: LibPrintTo-1.0
+
 ## X-Category: Development Tools
 ## X-Icon: Interface\Icons\Spell_Nature_Acid_01
 
